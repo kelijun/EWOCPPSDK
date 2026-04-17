@@ -5,7 +5,7 @@ EWOCPPSDK is a comprehensive protocol library designed for iOS to manage and con
 EWOCPPSDK is distributed via CocoaPods. Because the SDK contains compiled, closed-source binary frameworks, it is **crucial to strictly follow the steps below** when configuring your host project's `Podfile` to avoid build crashes or dependency conflicts.
 
 ### 2.1 Requirements
-- iOS 15.0 or later
+- iOS 12.0 or later
 - CocoaPods 1.10.0 or later
 
 ### 2.2 Podfile Configuration
@@ -14,8 +14,7 @@ Open your host project's `Podfile`, add the SDK dependency, and **ensure you con
 ```ruby
 platform :ios, '15.0'
 
-# 🌟 REQUIRED: Force dynamic linkage to prevent symbol conflicts from multiple static copies of underlying libraries (e.g., Bluetooth).
-use_frameworks! :linkage => :dynamic
+use_frameworks!
 
 target 'YourAppTargetName' do
   pod 'EWOCPPSDK'
