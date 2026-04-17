@@ -1,0 +1,594 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.0 effective-5.10 (swiftlang-6.0.0.9.10 clang-1600.0.26.2)
+// swift-module-flags: -target arm64-apple-ios15 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name EWOCPPSDK
+import CoreBluetooth
+import EWBluetoothSDK
+@_exported import EWOCPPSDK
+import Foundation
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public enum RFIDCardState : Swift.Int, Swift.CaseIterable {
+  case accepted
+  case blocked
+  case expired
+  case invalid
+  public init(safeRawValue: Swift.Int)
+  public init?(rawValue: Swift.Int)
+  public typealias AllCases = [EWOCPPSDK.RFIDCardState]
+  public typealias RawValue = Swift.Int
+  nonisolated public static var allCases: [EWOCPPSDK.RFIDCardState] {
+    get
+  }
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct RFIDCard : Swift.Identifiable {
+  public var id: Swift.String
+  public var state: EWOCPPSDK.RFIDCardState
+  public init(id: Swift.String, state: EWOCPPSDK.RFIDCardState)
+  @available(iOS 13.0, tvOS 13.0, watchOS 6.0, macOS 10.15, *)
+  public typealias ID = Swift.String
+}
+public typealias ReadRFIDCardsCompletion = (Swift.Result<[EWOCPPSDK.RFIDCard], EWOCPPSDK.EWOCPPError>) -> Swift.Void
+public typealias WriteRFIDCardsCompletion = (Swift.Result<Swift.Bool, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+public typealias ClearRFIDCardsCompletion = (Swift.Result<Swift.Bool, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+extension EWOCPPSDK.EWOCPPManager {
+  public func writeRFIDCards(cards: [EWOCPPSDK.RFIDCard], completion: @escaping EWOCPPSDK.WriteRFIDCardsCompletion)
+  public func clearAllRFIDCards(completion: @escaping EWOCPPSDK.ClearRFIDCardsCompletion)
+  public func readRFIDCards(completion: @escaping EWOCPPSDK.ReadRFIDCardsCompletion)
+}
+@objc @_inheritsConvenienceInitializers public class EWOCPPManager : ObjectiveC.NSObject {
+  public static let shared: EWOCPPSDK.EWOCPPManager
+  public static var logLevel: EWOCPPSDK.EWOCPPLogLevel {
+    get
+    set
+  }
+  @objc override dynamic public init()
+  @available(*, deprecated, message: "Use establishOcppConnection() instead")
+  public func ewOCPPStart()
+  public func establishOcppConnection(peripheral: EWBluetoothSDK.EWPeripheral)
+  public func ewOCPPPileTokenAuth(token: Swift.String, completion: EWOCPPSDK.EWOCPPCheckPileTokenCompletion?)
+  public func ewOCPPBindChargingPileToken(token: Swift.String, completion: EWOCPPSDK.EWOCPPPileTokenResultCompletion?)
+  public func ewOCPPUnbindPileToken(token: Swift.String, completion: EWOCPPSDK.EWOCPPPileTokenResultCompletion?)
+  public func ewOCPPConfigURL(url: Swift.String, username: Swift.String, password: Swift.String, completion: EWOCPPSDK.EWOCPPConfigURLCompletion?)
+  @available(*, deprecated, renamed: "readDeviceInfo(completion:)", message: "该方法已被废弃，请使用 readDeviceInfo")
+  public func ewOCPPDeviceInfo(completion: EWOCPPSDK.EWOCPPDeviceInfoCompletion?)
+  public func ewOCPPConfigNet(ch: EWOCPPSDK.EWOCPPNetType, ssid: Swift.String?, psw: Swift.String?, completion: EWOCPPSDK.EWOCPPConfigNetCompletion?)
+  public func ewOCPPNetworkState(reset: Swift.Bool, completion: EWOCPPSDK.EWOCPPNetworkStateCompletion?)
+  public func ewOCPPChangeAPN(apn: Swift.String?, completion: EWOCPPSDK.EWOCPPSetAPNCompletion?)
+  public func ewOCPPReset4GModule(completion: EWOCPPSDK.EWOCPPSetAPNCompletion?)
+  @objc deinit
+}
+public enum FrameErrorV2 : Swift.Error {
+  case dataTooShort
+  case invalidHeader
+  case invalidTail
+  case lengthMismatch
+  case checksumFailed
+  public static func == (a: EWOCPPSDK.FrameErrorV2, b: EWOCPPSDK.FrameErrorV2) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct ParsedFrameV2 {
+  public let command: Swift.UInt8
+  public let data: [Swift.UInt8]
+  public var isResponse: Swift.Bool {
+    get
+  }
+  public var originalCommand: Swift.UInt8 {
+    get
+  }
+  public var isSuccess: Swift.Bool {
+    get
+  }
+}
+public struct ProtocolV2 {
+  public static func encode(command: Swift.UInt8, payload: [Swift.UInt8] = []) -> Foundation.Data
+  public static func decode(rawData: Foundation.Data) -> Swift.Result<EWOCPPSDK.ParsedFrameV2, EWOCPPSDK.FrameErrorV2>
+}
+public enum PhaseSnapshot {
+  case single(current: Swift.Double, voltage: Swift.Double)
+  case triple(current: (a1: Swift.Double, a2: Swift.Double, a3: Swift.Double), voltage: (v1: Swift.Double, v2: Swift.Double, v3: Swift.Double))
+}
+public struct OrderSnapshot {
+  public let timestamp: Foundation.TimeInterval
+  public let phase: EWOCPPSDK.PhaseSnapshot
+  public let power: Swift.Int
+  public let energy: Swift.Int
+}
+public struct CachedOrder {
+  public let transactionID: Swift.Int
+  public let begin: EWOCPPSDK.OrderSnapshot
+  public let end: EWOCPPSDK.OrderSnapshot
+}
+public typealias ReadCachedOrderCountCompletion = (Swift.Result<Swift.Int, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+public typealias ReadCachedOrdersCompletion = (Swift.Result<[EWOCPPSDK.CachedOrder], EWOCPPSDK.EWOCPPError>) -> Swift.Void
+extension EWOCPPSDK.EWOCPPManager {
+  public func readCachedOrderCount(completion: @escaping EWOCPPSDK.ReadCachedOrderCountCompletion)
+  public func readAllCachedOrders(completion: @escaping EWOCPPSDK.ReadCachedOrdersCompletion)
+}
+public enum EWOCPPLogLevel : Swift.Int {
+  case none
+  case error
+  case info
+  case debug
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum OCPPStatus : Swift.UInt8 {
+  case available
+  case preparing
+  case charging
+  case suspendedEVSE
+  case suspendedEV
+  case finishing
+  case reserved
+  case unavailable
+  case faulted
+  case none
+  public var ocppStringValue: Swift.String {
+    get
+  }
+  public init?(rawValue: Swift.UInt8)
+  public typealias RawValue = Swift.UInt8
+  public var rawValue: Swift.UInt8 {
+    get
+  }
+}
+public enum SetCurrentLimitResult {
+  case success
+  case value(Swift.Int)
+}
+public struct PhaseElectricalData {
+  public let voltageA: Swift.Float
+  public let voltageB: Swift.Float
+  public let voltageC: Swift.Float
+  public let currentA: Swift.Float
+  public let currentB: Swift.Float
+  public let currentC: Swift.Float
+  public init(voltageA: Swift.Float = 0.0, voltageB: Swift.Float = 0.0, voltageC: Swift.Float = 0.0, currentA: Swift.Float = 0.0, currentB: Swift.Float = 0.0, currentC: Swift.Float = 0.0)
+  public func voltages(for phase: Swift.Int) -> [Swift.Float]
+  public func currents(for phase: Swift.Int) -> [Swift.Float]
+}
+public struct ChargingInfo {
+  public let connectorID: Swift.Int32
+  public let phaseCount: Swift.Int32
+  public let electrical: EWOCPPSDK.PhaseElectricalData
+  public let energy: Swift.Float
+  public let power: Swift.Float
+  public let isOnline: Swift.Bool
+  public let isCharging: Swift.Bool
+  public let ocppStatus: EWOCPPSDK.OCPPStatus
+  public let tagID: Swift.String
+  public let parentTagID: Swift.String
+  public init(connectorID: Swift.Int32 = 0, phaseCount: Swift.Int32 = 0, electrical: EWOCPPSDK.PhaseElectricalData = PhaseElectricalData(), energy: Swift.Float = 0.0, power: Swift.Float = 0.0, isOnline: Swift.Bool = false, isCharging: Swift.Bool = false, ocppStatus: EWOCPPSDK.OCPPStatus = .none, tagID: Swift.String = "", parentTagID: Swift.String = "")
+}
+public typealias ChargingControlCompletion = (Swift.Result<Swift.Bool, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+public typealias GetChargeInfoCompletion = (Swift.Result<EWOCPPSDK.ChargingInfo, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+public typealias SetCurrentLimitCompletion = (Swift.Result<EWOCPPSDK.SetCurrentLimitResult, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+extension EWOCPPSDK.EWOCPPManager {
+  public func startCharging(ampere: Swift.Int?, completion: @escaping EWOCPPSDK.ChargingControlCompletion)
+  public func stopCharging(completion: @escaping EWOCPPSDK.ChargingControlCompletion)
+  public func adjustCurrent(ampere: Swift.Int, completion: @escaping EWOCPPSDK.ChargingControlCompletion)
+  public func getChargeInfo(completion: @escaping EWOCPPSDK.GetChargeInfoCompletion)
+  public func readCurrentLimitValue(completion: @escaping EWOCPPSDK.SetCurrentLimitCompletion)
+  public func setCurrentLimit(_ ampere: Swift.Int, echo: Swift.Bool = false, completion: @escaping EWOCPPSDK.SetCurrentLimitCompletion)
+}
+extension EWOCPPSDK.EWOCPPManager : EWBluetoothSDK.EWPeripheralDelegate {
+  @objc dynamic public func ewPeripheral(_ peripheral: EWBluetoothSDK.EWPeripheral, didDiscover service: EWBluetoothSDK.EWService)
+  @objc dynamic public func ewPeripheral(_ peripheral: EWBluetoothSDK.EWPeripheral, didDiscoverCharacteristics characteristic: EWBluetoothSDK.EWCharacteristic, for service: EWBluetoothSDK.EWService)
+  @objc dynamic public func ewPeripheral(_ peripheral: EWBluetoothSDK.EWPeripheral, didUpdateNotificationStateFor characteristic: EWBluetoothSDK.EWCharacteristic, error: any Swift.Error)
+  @objc dynamic public func ewPeripheral(_ peripheral: EWBluetoothSDK.EWPeripheral, didUpdateValueFor characteristic: EWBluetoothSDK.EWCharacteristic, error: any Swift.Error)
+}
+public enum EWOCPPOtaType : Swift.Int, Swift.Codable {
+  case network
+  case app
+  case mcb
+  case ui
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+extension EWOCPPSDK.EWOCPPOtaType {
+  public init?(fromFileName fileName: Swift.String)
+}
+public enum EWOCPPOtaStatus : Swift.UInt8 {
+  case success
+  case checkError
+  case writeFailed
+  case unknown
+  public init?(rawValue: Swift.UInt8)
+  public typealias RawValue = Swift.UInt8
+  public var rawValue: Swift.UInt8 {
+    get
+  }
+}
+public typealias OTAUpgradeCompletion = (Swift.Result<Swift.Bool, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+public typealias OTAProgressCompletion = (Swift.Double) -> Swift.Void
+extension EWOCPPSDK.EWOCPPManager {
+  public func startOTAUpgrade(fileURL: Foundation.URL, type: EWOCPPSDK.EWOCPPOtaType, progress: @escaping EWOCPPSDK.OTAProgressCompletion, completion: @escaping EWOCPPSDK.OTAUpgradeCompletion)
+  public func startLANOTAUpgrade(ipAddress: Swift.String, fileURL: Foundation.URL, progress: @escaping EWOCPPSDK.OTAProgressCompletion, completion: @escaping EWOCPPSDK.OTAUpgradeCompletion)
+}
+public enum ErrorRecordSeverity : Swift.Int, Swift.Equatable {
+  case warning
+  case error
+  case unknown
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum ErrorConfigType : Swift.Int {
+  case read
+  case error
+  case warning
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct ErrorRecordItem : Swift.Equatable {
+  public let timestamp: Foundation.TimeInterval
+  public let code: Swift.Int
+  public let severity: EWOCPPSDK.ErrorRecordSeverity
+  public static func == (a: EWOCPPSDK.ErrorRecordItem, b: EWOCPPSDK.ErrorRecordItem) -> Swift.Bool
+}
+public struct ErrorRecord : Swift.Equatable {
+  public let timestamp: Foundation.TimeInterval
+  public let errors: [EWOCPPSDK.ErrorRecordItem]
+  public static func == (a: EWOCPPSDK.ErrorRecord, b: EWOCPPSDK.ErrorRecord) -> Swift.Bool
+}
+public struct ErrorConfiguration : Swift.Equatable {
+  public let errorIndices: [Swift.Int]
+  public let warningIndices: [Swift.Int]
+  public init(errorIndices: [Swift.Int], warningIndices: [Swift.Int])
+  public static func == (a: EWOCPPSDK.ErrorConfiguration, b: EWOCPPSDK.ErrorConfiguration) -> Swift.Bool
+}
+public typealias ReadErrorRecordCountCompletion = (Swift.Result<Swift.Int, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+public typealias ReadErrorRecordsCompletion = (Swift.Result<[EWOCPPSDK.ErrorRecord], EWOCPPSDK.EWOCPPError>) -> Swift.Void
+public typealias ErrorConfigCompletion = (Swift.Result<EWOCPPSDK.ErrorConfiguration, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+extension EWOCPPSDK.EWOCPPManager {
+  public func readErrorReportCount(completion: @escaping EWOCPPSDK.ReadErrorRecordCountCompletion)
+  public func readErrorRecords(completion: @escaping EWOCPPSDK.ReadErrorRecordsCompletion)
+  public func readErrorRecords(offset: Swift.Int, limit: Swift.Int, completion: @escaping EWOCPPSDK.ReadErrorRecordsCompletion)
+  public func readErrorConfig(completion: @escaping EWOCPPSDK.ErrorConfigCompletion)
+  public func setErrorConfig(type: EWOCPPSDK.ErrorConfigType, errorIndices: [Swift.Int]? = nil, warningIndices: [Swift.Int]? = nil, completion: @escaping EWOCPPSDK.ErrorConfigCompletion)
+}
+public enum EWOCPPBLEState {
+  case unknown
+  case resetting
+  case unsupported
+  case unauthorized
+  case poweredOff
+  case poweredOn
+  public static func == (a: EWOCPPSDK.EWOCPPBLEState, b: EWOCPPSDK.EWOCPPBLEState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum EWOCPPNetType : Swift.Int, Swift.Codable {
+  case WIFI
+  case ETHERNET
+  case LTE
+  case OFFLINE
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public enum EWOCPPNetworkState {
+  case failed
+  case connecting
+  case connected
+  case connectedServer
+  public static func == (a: EWOCPPSDK.EWOCPPNetworkState, b: EWOCPPSDK.EWOCPPNetworkState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum EWOCPPPileTokenAuthState {
+  case success
+  case failure
+  case none
+  public static func == (a: EWOCPPSDK.EWOCPPPileTokenAuthState, b: EWOCPPSDK.EWOCPPPileTokenAuthState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public enum EWOCPP4GNetRegistrationState {
+  case unregistered
+  case registeredLocal
+  case searching
+  case registeredRoaming
+  case reject
+  case unknown
+  public static func == (a: EWOCPPSDK.EWOCPP4GNetRegistrationState, b: EWOCPPSDK.EWOCPP4GNetRegistrationState) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public struct EWOCPPSetPasswordModel {
+  public var res: Swift.Bool
+  public var password: Swift.String?
+}
+public struct EWOCPPDeviceInfoModel {
+  public var sn: Swift.String?
+  public var wifissid: Swift.String?
+  public var wifiPsw: Swift.String?
+  public var netState: Swift.Bool?
+  public var apn: Swift.String?
+  public var ltens: EWOCPPSDK.EWOCPP4GNetRegistrationState
+  public var ccid: Swift.String?
+}
+public struct EWOCPPConfigNetModel {
+  public var res: Swift.Bool
+  public var data: Swift.String?
+}
+public struct EWOCPPNetworkStateModel {
+  public var res: Swift.Bool
+  public var state: EWOCPPSDK.EWOCPPNetworkState
+}
+public enum EWOCPPError : Swift.Error, Foundation.LocalizedError {
+  case bluetoothNotSupported
+  case bluetoothUnknown
+  case bluetoothUnauthorized
+  case bluetoothResetting
+  case bluetoothOff
+  case failedToConnect
+  case deviceDisconnected
+  case invalidURL
+  case noData
+  case dataConvertError
+  case invalidKey
+  case notFoundDevice
+  case tokenAuthFailed
+  case tokenNotEmpty
+  case tokenIsEmpty
+  case unKnownError
+  case writeDenied
+  case repeatedUpgrade
+  case networkError
+  public var localizedDescription: Swift.String {
+    get
+  }
+  public static func == (a: EWOCPPSDK.EWOCPPError, b: EWOCPPSDK.EWOCPPError) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+public typealias EWOCPPConfigURLCompletion = (Swift.Bool, EWOCPPSDK.EWOCPPError?) -> Swift.Void
+public typealias EWOCPPDeviceInfoCompletion = (EWOCPPSDK.EWOCPPDeviceInfoModel?, EWOCPPSDK.EWOCPPError?) -> Swift.Void
+public typealias EWOCPPConfigNetCompletion = (EWOCPPSDK.EWOCPPConfigNetModel?, EWOCPPSDK.EWOCPPError?) -> Swift.Void
+public typealias EWOCPPCheckPileTokenCompletion = (EWOCPPSDK.EWOCPPPileTokenAuthState, Swift.String?, EWOCPPSDK.EWOCPPError?) -> Swift.Void
+public typealias EWOCPPPileTokenResultCompletion = (Swift.Bool, EWOCPPSDK.EWOCPPError?) -> Swift.Void
+public typealias EWOCPPNetworkStateCompletion = (EWOCPPSDK.EWOCPPNetworkState, EWOCPPSDK.EWOCPPError?) -> Swift.Void
+public typealias EWOCPPSetAPNCompletion = (Swift.Bool, EWOCPPSDK.EWOCPPError?) -> Swift.Void
+public enum DeviceControlType : Swift.Int {
+  case reset
+  case restart
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public typealias DeviceControlCompletion = (Swift.Result<Swift.Bool, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+extension EWOCPPSDK.EWOCPPManager {
+  public func resetDevice(completion: @escaping EWOCPPSDK.DeviceControlCompletion)
+  public func restartDevice(completion: @escaping EWOCPPSDK.DeviceControlCompletion)
+}
+public enum OCPPSampledDataType : Swift.String, Swift.CaseIterable {
+  case ci
+  case co
+  case eair
+  case eaii
+  case pai
+  case v
+  case t
+  case po
+  public var fullName: Swift.String {
+    get
+  }
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [EWOCPPSDK.OCPPSampledDataType]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [EWOCPPSDK.OCPPSampledDataType] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum OCPPFeatureProfile : Swift.String, Swift.CaseIterable {
+  case core
+  case firmwareManagement
+  case localAuthListManagement
+  case reservation
+  case smartCharging
+  case remoteTrigger
+  public var fullName: Swift.String {
+    get
+  }
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [EWOCPPSDK.OCPPFeatureProfile]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [EWOCPPSDK.OCPPFeatureProfile] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum OCPPChargingRateUnit : Swift.String, Swift.CaseIterable {
+  case current
+  case power
+  public var fullName: Swift.String {
+    get
+  }
+  public init?(rawValue: Swift.String)
+  public typealias AllCases = [EWOCPPSDK.OCPPChargingRateUnit]
+  public typealias RawValue = Swift.String
+  nonisolated public static var allCases: [EWOCPPSDK.OCPPChargingRateUnit] {
+    get
+  }
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum LTENetworkStatus : Swift.Int {
+  case unregistered
+  case registeredHome
+  case searching
+  case registrationDenied
+  case unknown
+  case registeredRoaming
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct BaseConfiguration {
+  public var authorizeRemoteTxRequests: Swift.Bool
+  public var stopTransactionOnInvalidId: Swift.Bool
+  public var maxChargingProfilesInstalled: Swift.Int
+  public var localPreAuthorize: Swift.Bool
+  public var stopTransactionOnEVSideDisconnect: Swift.Bool
+  public var blinkRepeat: Swift.Int
+  public var clockAlignedDataInterval: Swift.Int
+  public var webSocketPingInterval: Swift.Int
+  public var chargeProfileMaxStackLevel: Swift.Int
+  public var connectionTimeOut: Swift.Int
+  public var meterValuesSampledData: [EWOCPPSDK.OCPPSampledDataType]
+  public var chargingScheduleAllowedChargingRateUnit: [EWOCPPSDK.OCPPChargingRateUnit]
+  public var stopTxnSampledData: [EWOCPPSDK.OCPPSampledDataType]
+  public var supportedFeatureProfiles: [EWOCPPSDK.OCPPFeatureProfile]
+  public var getConfigurationMaxKeys: Swift.Int
+  public var heartbeatInterval: Swift.Int
+  public var chargingScheduleMaxPeriods: Swift.Int
+  public var meterValuesSampledDataMaxLength: Swift.Int
+  public var meterValueSampleInterval: Swift.Int
+  public var minimumStatusDuration: Swift.Int
+  public var numberOfConnectors: Swift.Int
+  public var resetRetries: Swift.Int
+  public var stopTxnSampledDataMaxLength: Swift.Int
+  public var supportedFeatureProfilesMaxLength: Swift.Int
+  public var transactionMessageAttempts: Swift.Int
+  public var transactionMessageRetryInterval: Swift.Int
+  public init()
+}
+public struct DeviceInfo {
+  public let bluetoothFirmwareVersion: Swift.String
+  public let mcbFirmwareVersion: Swift.Double
+  public let appFirmwareVersion: Swift.Double
+  public let bluetoothHardwareVersion: Swift.Double
+  public let mcbHardwareVersion: Swift.Double
+  public let appHardwareVersion: Swift.Double
+  public let bluetoothModuleModel: Swift.Int
+  public let mcbModuleModel: Swift.Int
+  public let appModuleModel: Swift.Int
+  public let serialNumber: Swift.String
+  public let productModel: Swift.String
+  public let maxCurrent: Swift.Float
+  public let maxPower: Swift.Float
+  public let phaseCount: Swift.Int
+  public let chargePointType: Swift.Int
+  public let temperatureUnit: Swift.Int
+  public let timeZone: Swift.String
+  public let wifiSSID: Swift.String
+  public let networkType: Swift.String
+  public let connectedNetwork: Swift.Bool
+  public let connectorCount: Swift.Int
+  public let serverURL: Swift.String
+  public let authToken: Swift.String
+  public let vendor: Swift.String
+  public let apn: Swift.String
+  public let lteNetworkStatus: EWOCPPSDK.LTENetworkStatus
+  public let simCardID: Swift.String
+  public let isFactoryDirectChargeEnabled: Swift.Bool
+  public let isDirectChargeEnabled: Swift.Bool
+  public let directChargeTag: Swift.String
+  public let isDirectChargeNoAuthEnabled: Swift.Bool
+  public let isAliCloudLoggingEnabled: Swift.Bool
+}
+extension EWOCPPSDK.BaseConfiguration {
+  public static func decode(from data: Foundation.Data) throws -> EWOCPPSDK.BaseConfiguration
+  public func encodeToJSON(id: Swift.Int, req: Swift.Int) throws -> Foundation.Data
+}
+public typealias ReadBaseConfigurationCompletion = (Swift.Result<EWOCPPSDK.BaseConfiguration, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+public typealias SetBaseConfigurationCompletion = (Swift.Result<Swift.Bool, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+public typealias DeviceInfoCompletion = (Swift.Result<EWOCPPSDK.DeviceInfo, EWOCPPSDK.EWOCPPError>) -> Swift.Void
+extension EWOCPPSDK.EWOCPPManager {
+  public func readDeviceInfo(completion: @escaping EWOCPPSDK.DeviceInfoCompletion)
+  public func setDeviceInfo(serialNumber: Swift.Int, productModel: Swift.String, vendor: Swift.String, completion: @escaping EWOCPPSDK.DeviceInfoCompletion)
+  public func readBaseConfiguration(completion: @escaping EWOCPPSDK.ReadBaseConfigurationCompletion)
+  public func setBaseConfiguration(configuration: EWOCPPSDK.BaseConfiguration, completion: @escaping EWOCPPSDK.SetBaseConfigurationCompletion)
+}
+extension EWOCPPSDK.RFIDCardState : Swift.Equatable {}
+extension EWOCPPSDK.RFIDCardState : Swift.Hashable {}
+extension EWOCPPSDK.RFIDCardState : Swift.RawRepresentable {}
+extension EWOCPPSDK.FrameErrorV2 : Swift.Equatable {}
+extension EWOCPPSDK.FrameErrorV2 : Swift.Hashable {}
+extension EWOCPPSDK.EWOCPPLogLevel : Swift.Equatable {}
+extension EWOCPPSDK.EWOCPPLogLevel : Swift.Hashable {}
+extension EWOCPPSDK.EWOCPPLogLevel : Swift.RawRepresentable {}
+extension EWOCPPSDK.OCPPStatus : Swift.Equatable {}
+extension EWOCPPSDK.OCPPStatus : Swift.Hashable {}
+extension EWOCPPSDK.OCPPStatus : Swift.RawRepresentable {}
+extension EWOCPPSDK.EWOCPPOtaType : Swift.Equatable {}
+extension EWOCPPSDK.EWOCPPOtaType : Swift.Hashable {}
+extension EWOCPPSDK.EWOCPPOtaType : Swift.RawRepresentable {}
+extension EWOCPPSDK.EWOCPPOtaStatus : Swift.Equatable {}
+extension EWOCPPSDK.EWOCPPOtaStatus : Swift.Hashable {}
+extension EWOCPPSDK.EWOCPPOtaStatus : Swift.RawRepresentable {}
+extension EWOCPPSDK.ErrorRecordSeverity : Swift.Hashable {}
+extension EWOCPPSDK.ErrorRecordSeverity : Swift.RawRepresentable {}
+extension EWOCPPSDK.ErrorConfigType : Swift.Equatable {}
+extension EWOCPPSDK.ErrorConfigType : Swift.Hashable {}
+extension EWOCPPSDK.ErrorConfigType : Swift.RawRepresentable {}
+extension EWOCPPSDK.EWOCPPBLEState : Swift.Equatable {}
+extension EWOCPPSDK.EWOCPPBLEState : Swift.Hashable {}
+extension EWOCPPSDK.EWOCPPNetType : Swift.Equatable {}
+extension EWOCPPSDK.EWOCPPNetType : Swift.Hashable {}
+extension EWOCPPSDK.EWOCPPNetType : Swift.RawRepresentable {}
+extension EWOCPPSDK.EWOCPPNetworkState : Swift.Equatable {}
+extension EWOCPPSDK.EWOCPPNetworkState : Swift.Hashable {}
+extension EWOCPPSDK.EWOCPPPileTokenAuthState : Swift.Equatable {}
+extension EWOCPPSDK.EWOCPPPileTokenAuthState : Swift.Hashable {}
+extension EWOCPPSDK.EWOCPP4GNetRegistrationState : Swift.Equatable {}
+extension EWOCPPSDK.EWOCPP4GNetRegistrationState : Swift.Hashable {}
+extension EWOCPPSDK.EWOCPPError : Swift.Equatable {}
+extension EWOCPPSDK.EWOCPPError : Swift.Hashable {}
+extension EWOCPPSDK.DeviceControlType : Swift.Equatable {}
+extension EWOCPPSDK.DeviceControlType : Swift.Hashable {}
+extension EWOCPPSDK.DeviceControlType : Swift.RawRepresentable {}
+extension EWOCPPSDK.OCPPSampledDataType : Swift.Equatable {}
+extension EWOCPPSDK.OCPPSampledDataType : Swift.Hashable {}
+extension EWOCPPSDK.OCPPSampledDataType : Swift.RawRepresentable {}
+extension EWOCPPSDK.OCPPFeatureProfile : Swift.Equatable {}
+extension EWOCPPSDK.OCPPFeatureProfile : Swift.Hashable {}
+extension EWOCPPSDK.OCPPFeatureProfile : Swift.RawRepresentable {}
+extension EWOCPPSDK.OCPPChargingRateUnit : Swift.Equatable {}
+extension EWOCPPSDK.OCPPChargingRateUnit : Swift.Hashable {}
+extension EWOCPPSDK.OCPPChargingRateUnit : Swift.RawRepresentable {}
+extension EWOCPPSDK.LTENetworkStatus : Swift.Equatable {}
+extension EWOCPPSDK.LTENetworkStatus : Swift.Hashable {}
+extension EWOCPPSDK.LTENetworkStatus : Swift.RawRepresentable {}

@@ -1,0 +1,6 @@
+framework module EWOCPPSDK {
+  umbrella header "EWOCPPSDK.h"
+  export *
+
+  module * { export * }
+}
