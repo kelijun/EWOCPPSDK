@@ -2,9 +2,35 @@
 ## 1. 简介
 EWOCPPSDK 是一套专为 iOS 平台设计的充电桩本地化管理与控制协议库。它提供了从低功耗蓝牙 (BLE) 连接、网络配置、RFID 卡片管理、充电控制到 OTA 升级的全套功能。
 
-**适用环境:**
+## 2. 安装指南 (Installation)
+EWOCPPSDK 推荐采用 CocoaPods 进行私有化接入。由于 SDK 包含底层闭源二进制框架，请**务必严格按照以下步骤**配置主工程的 `Podfile`，以避免编译崩溃或底层依赖冲突。
+
+### 2.1 环境要求
 - iOS 15.0 及以上
 - Swift 5.0 及以上
+
+### 2.2 配置 Podfile
+```ruby
+platform :ios, '15.0'
+
+# 🌟 必须开启：强制使用动态链接，防止底层库(如蓝牙库)被多次静态拷贝引发符号冲突
+use_frameworks! :linkage => :dynamic
+
+target 'YourAppTargetName' do
+  pod 'EWOCPPSDK'
+  # 请将 tag 替换为 SDK 最新发布的版本号
+  pod 'EWOCPPSDK', :git => '[https://github.com/kelijun/EWOCPPSDK.git](https://github.com/kelijun/EWOCPPSDK.git)', :tag => '1.0.0'
+end
+
+# 🌟 必须配置：开启所有底层依赖的模块稳定性，防止因 Xcode 版本不同导致 Signal 6 崩溃
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+    end
+  end
+end
 
 ## 2. 初始化与配置
 
